@@ -57,18 +57,19 @@ export class SigHashUtils extends SmartContractLib {
         assert(e == shPreimage._e + toByteString('01'), 'invalid value of _e')
         const s = SigHashUtils.Gx + shPreimage._e + toByteString('02')
         const sigHash = sha256(
+            SigHashUtils.preimagePrefix +
             shPreimage.txVer +
-                shPreimage.nLockTime +
-                shPreimage.hashPrevouts +
-                shPreimage.hashSpentAmounts +
-                shPreimage.hashSpentScripts +
-                shPreimage.hashSequences +
-                shPreimage.hashOutputs +
-                shPreimage.spendType +
-                shPreimage.inputNumber +
-                shPreimage.hashTapLeaf +
-                shPreimage.keyVer +
-                shPreimage.codeSeparator
+            shPreimage.nLockTime +
+            shPreimage.hashPrevouts +
+            shPreimage.hashSpentAmounts +
+            shPreimage.hashSpentScripts +
+            shPreimage.hashSequences +
+            shPreimage.hashOutputs +
+            shPreimage.spendType +
+            shPreimage.inputNumber +
+            shPreimage.hashTapLeaf +
+            shPreimage.keyVer +
+            shPreimage.codeSeparator
         )
         assert(sigHash == shPreimage.sigHash, 'sigHash mismatch')
 
