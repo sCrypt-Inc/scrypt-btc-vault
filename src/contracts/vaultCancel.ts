@@ -4,58 +4,46 @@ import {
     method,
     prop,
     PubKey,
-    sha256,
     Sig,
     SmartContract,
+    toByteString,
 } from 'scrypt-ts'
 import { SHPreimage, SigHashUtils } from './sigHashUtils'
 
-export class VaultUnvaulted extends SmartContract {
+export class VaultCancel extends SmartContract {
     @prop()
     sequenceVal: ByteString
 
     @prop()
-    withdrawalPubKey: PubKey
-
-    @prop()
     cancelPubKey: PubKey
-
-    @prop()
-    vaultCancelP2TROutput: ByteString
 
     /**
      *
      * @param sequenceVal  - Specifies (relative) time until the vault can be unlocked.
-     * @param withdrawalPubKey - Public key, used for withdrawal.
      * @param cancelPubKey - Public key, used for canceling.
-     * @param vaultCancelP2TROutput - P2TR to the canceling state contract.
      *
      */
     constructor(
         sequenceVal: ByteString,
-        withdrawalPubKey: PubKey,
         cancelPubKey: PubKey,
     ) {
         super(...arguments)
         this.sequenceVal = sequenceVal
-        this.withdrawalPubKey = withdrawalPubKey
         this.cancelPubKey = cancelPubKey
-        this.vaultCancelP2TROutput = this.vaultCancelP2TROutput
     }
 
     @method()
-    public withdraw(sig: Sig) {
+    public complete(sig: Sig) {
         this.csv(this.sequenceVal)
 
         // Check sig.
-        assert(this.checkSig(sig, this.withdrawalPubKey))
+        assert(this.checkSig(sig, this.cancelPubKey))
     }
     
     @method()
-    public cancel(
+    public burn(
         shPreimage: SHPreimage,
-        sig: Sig,
-        outputsSuffix: ByteString
+        sig: Sig
     ) {
         // Check sig.
         assert(this.checkSig(sig, this.cancelPubKey))
@@ -64,10 +52,9 @@ export class VaultUnvaulted extends SmartContract {
         const s = SigHashUtils.checkSHPreimage(shPreimage)
         assert(this.checkSig(s, SigHashUtils.Gx))
 
-        // Check first output is P2TR to the canceling contract
-        const hashOutputs = sha256(
-            this.vaultCancelP2TROutput + outputsSuffix
-        )
+        // Burn funds
+        // sha256(22020000000000001976a914759d6677091e973b9e9d99f19c68fbf43e3f05f988ac)
+        const hashOutputs = toByteString('8d4f1a996bba82ca746d12c53f5f0bbbb993214258fc734e6eb97cd9b67eaaab')
         assert(hashOutputs == shPreimage.hashOutputs, 'hashOutputs mismatch')
     }
 
