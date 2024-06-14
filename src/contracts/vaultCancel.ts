@@ -4,6 +4,7 @@ import {
     method,
     prop,
     PubKey,
+    sha256,
     Sig,
     SmartContract,
     toByteString,
@@ -52,9 +53,8 @@ export class VaultCancel extends SmartContract {
         const s = SigHashUtils.checkSHPreimage(shPreimage)
         assert(this.checkSig(s, SigHashUtils.Gx))
 
-        // Burn funds
-        // sha256(22020000000000001976a914759d6677091e973b9e9d99f19c68fbf43e3f05f988ac)
-        const hashOutputs = toByteString('8d4f1a996bba82ca746d12c53f5f0bbbb993214258fc734e6eb97cd9b67eaaab')
+        // Pay all to miners.
+        const hashOutputs = sha256(toByteString('0000000000000000016a'))
         assert(hashOutputs == shPreimage.hashOutputs, 'hashOutputs mismatch')
     }
 
