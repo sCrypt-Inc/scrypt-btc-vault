@@ -7,44 +7,35 @@ import {
     sha256,
     Sig,
     SmartContract,
-    toByteString,
 } from 'scrypt-ts'
 import { SHPreimage, SigHashUtils } from './sigHashUtils'
 
-export class VaultCancel extends SmartContract {
-    @prop()
-    sequenceVal: ByteString
+
+export class VaultCancelWithdrawal extends SmartContract {
 
     @prop()
     cancelPubKey: PubKey
 
     /**
      *
-     * @param sequenceVal  - Specifies (relative) time until the vault can be unlocked.
      * @param cancelPubKey - Public key, used for canceling.
      *
      */
     constructor(
-        sequenceVal: ByteString,
         cancelPubKey: PubKey,
     ) {
         super(...arguments)
-        this.sequenceVal = sequenceVal
         this.cancelPubKey = cancelPubKey
     }
 
     @method()
-    public complete(sig: Sig) {
-        this.csv(this.sequenceVal)
-
-        // Check sig.
-        assert(this.checkSig(sig, this.cancelPubKey))
-    }
-    
-    @method()
-    public burn(
+    public trigger(
         shPreimage: SHPreimage,
-        sig: Sig
+        sig: Sig,
+        vaultSPK: ByteString,
+        feeSPK: ByteString,
+        vaultAmt: ByteString,
+        feeAmt: ByteString
     ) {
         // Check sig.
         assert(this.checkSig(sig, this.cancelPubKey))
@@ -53,16 +44,19 @@ export class VaultCancel extends SmartContract {
         const s = SigHashUtils.checkSHPreimage(shPreimage)
         assert(this.checkSig(s, SigHashUtils.Gx))
 
-        // Pay all to miners.
-        const hashOutputs = sha256(toByteString('0000000000000000016a'))
-        assert(hashOutputs == shPreimage.hashOutputs, 'hashOutputs mismatch')
-    }
+        // Enforce spent scripts.
+        const hashSpentScripts = sha256(vaultSPK + feeSPK)
+        assert(hashSpentScripts == shPreimage.hashSpentScripts, 'hashSpentScripts mismatch')
 
-    @method()
-    private csv(sequenceVal: ByteString): void {
-        // ... Gets substituted for OP_CSV w/ inline assembly hook
-        // TODO: Rm once OP_CSV is added to compiler.
-        assert(true)
+        // Enforce spent amounts.
+        const hashSpentAmounts = sha256(vaultAmt + feeAmt)
+        assert(hashSpentAmounts == shPreimage.hashSpentAmounts, 'hashSpentAmounts mismatch')
+
+        // Enforce outputs.
+        const hashOutputs = sha256(
+            vaultAmt + vaultSPK
+        )
+        assert(hashOutputs == shPreimage.hashOutputs, 'hashOutputs mismatch')
     }
 
     // Default taproot key spend must be disabled!

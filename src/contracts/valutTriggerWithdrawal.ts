@@ -7,37 +7,37 @@ import {
     sha256,
     Sig,
     SmartContract,
+    toByteString,
 } from 'scrypt-ts'
 import { SHPreimage, SigHashUtils } from './sigHashUtils'
 
-export class VaultLocked extends SmartContract {
-    @prop()
-    withdrawalPubKey: PubKey
+
+export class VaultTriggerWithdrawal extends SmartContract {
 
     @prop()
-    vaultUnvaultedP2TROutput: ByteString
+    withdrawalPubKey: PubKey
 
     /**
      *
      * @param withdrawalPubKey - Public key, used for withdrawal.
-     * @param cancelPubKey - Public key, used for canceling.
-     * @param vaultUnvaultedP2TROutput - P2TR to the unvaulted state contract.
      *
      */
     constructor(
         withdrawalPubKey: PubKey,
-        vaultUnvaultedP2TROutput: ByteString
     ) {
         super(...arguments)
         this.withdrawalPubKey = withdrawalPubKey
-        this.vaultUnvaultedP2TROutput = vaultUnvaultedP2TROutput
     }
 
     @method()
-    public unvault(
+    public trigger(
         shPreimage: SHPreimage,
         sig: Sig,
-        outputsSuffix: ByteString
+        vaultSPK: ByteString,
+        feeSPK: ByteString,
+        vaultAmt: ByteString,
+        feeAmt: ByteString,
+        targetSPK: ByteString
     ) {
         // Check sig.
         assert(this.checkSig(sig, this.withdrawalPubKey))
@@ -46,9 +46,19 @@ export class VaultLocked extends SmartContract {
         const s = SigHashUtils.checkSHPreimage(shPreimage)
         assert(this.checkSig(s, SigHashUtils.Gx))
 
-        // Check first output is P2TR to the unvaulted contract
+        // Enforce spent scripts.
+        const hashSpentScripts = sha256(vaultSPK + feeSPK)
+        assert(hashSpentScripts == shPreimage.hashSpentScripts, 'hashSpentScripts mismatch')
+
+        // Enforce spent amounts.
+        const hashSpentAmounts = sha256(vaultAmt + feeAmt)
+        assert(hashSpentAmounts == shPreimage.hashSpentAmounts, 'hashSpentAmounts mismatch')
+
+        // Enforce outputs.
+        const dust = toByteString('2202000000000000')
         const hashOutputs = sha256(
-            this.vaultUnvaultedP2TROutput + outputsSuffix
+            vaultAmt + vaultSPK +
+            dust + targetSPK
         )
         assert(hashOutputs == shPreimage.hashOutputs, 'hashOutputs mismatch')
     }
