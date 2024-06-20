@@ -1,6 +1,6 @@
 import { expect, use } from 'chai'
 import { PubKey, sha256, toByteString } from 'scrypt-ts'
-import { VaultTriggerWithdrawal } from '../src/contracts/valutTriggerWithdrawal'
+import { VaultTriggerWithdrawal } from '../src/contracts/vaultTriggerWithdrawal'
 import { VaultCompleteWithdrawal } from '../src/contracts/vaultCompleteWithdrawal'
 import { VaultCancelWithdrawal } from '../src/contracts/vaultCancelWithdrawal'
 import { getDefaultSigner } from './utils/txHelper'
