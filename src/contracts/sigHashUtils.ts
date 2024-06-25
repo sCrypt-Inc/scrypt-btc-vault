@@ -11,7 +11,8 @@ import {
 } from 'scrypt-ts'
 
 const TAG_HASH =
-    'f40a48df4b2a70c8b4924bf2654661ed3d95fd66a313eb87237597c628e4a031' // sha256("BIP0340/challenge")
+    '7bb52d7a9fef58323eb1bf7a407db382d2f3f2d81bb1224f49fe518f6d48d37c' // sha256("BIP0340/challenge")
+const TAPSIGHASH = 'f40a48df4b2a70c8b4924bf2654661ed3d95fd66a313eb87237597c628e4a031'  // sha256("TapSighash")
 const Gx = '79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'
 const PREIMAGE_SIGHASH = '00' // SIGHASH_ALL
 const PREIMAGE_EPOCH = '00'
@@ -44,12 +45,12 @@ export class SigHashUtils extends SmartContractLib {
     )
     @prop()
     static readonly ePreimagePrefix: ByteString = toByteString(
-        'f40a48df4b2a70c8b4924bf2654661ed3d95fd66a313eb87237597c628e4a031f40a48df4b2a70c8b4924bf2654661ed3d95fd66a313eb87237597c628e4a03179be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179879be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'
+        '7bb52d7a9fef58323eb1bf7a407db382d2f3f2d81bb1224f49fe518f6d48d37c7bb52d7a9fef58323eb1bf7a407db382d2f3f2d81bb1224f49fe518f6d48d37c79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179879be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'
     ) // TAG_HASH + TAG_HASH + Gx + Gx
     @prop()
     static readonly preimagePrefix: ByteString = toByteString(
         'f40a48df4b2a70c8b4924bf2654661ed3d95fd66a313eb87237597c628e4a031f40a48df4b2a70c8b4924bf2654661ed3d95fd66a313eb87237597c628e4a0310000'
-    ) // TAG_HASH + TAG_HASH + PREIMAGE_SIGHASH + PREIMAGE_EPOCH
+    ) // TAPSIGHASH + TAPSIGHASH + PREIMAGE_SIGHASH + PREIMAGE_EPOCH
 
     @method()
     static checkSHPreimage(shPreimage: SHPreimage): Sig {
