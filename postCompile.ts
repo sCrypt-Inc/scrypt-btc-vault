@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const filePath = path.resolve(__dirname, './artifacts/vaultCompleteWithdrawal.scrypt');
+const filePath = path.resolve(__dirname, './artifacts/vaultCompleteWithdrawal.json');
 
 fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
