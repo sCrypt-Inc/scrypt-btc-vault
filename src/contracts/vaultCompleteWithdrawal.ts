@@ -14,7 +14,7 @@ import { SHPreimage, SigHashUtils } from './sigHashUtils'
 export class VaultCompleteWithdrawal extends SmartContract {
 
     @prop()
-    sequenceVal: ByteString
+    sequenceVal: bigint
 
     /**
      *
@@ -22,7 +22,7 @@ export class VaultCompleteWithdrawal extends SmartContract {
      *
      */
     constructor(
-        sequenceVal: ByteString
+        sequenceVal: bigint
     ) {
         super(...arguments)
         this.sequenceVal = sequenceVal
@@ -71,7 +71,7 @@ export class VaultCompleteWithdrawal extends SmartContract {
     }
 
     @method()
-    private csv(sequenceVal: ByteString): void {
+    private csv(sequenceVal: bigint): void {
         // ... Gets substituted for OP_CSV w/ inline assembly hook
         // TODO: Rm once OP_CSV is added to compiler.
         assert(true)
