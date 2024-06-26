@@ -321,6 +321,8 @@ describe('Test SmartContract `Vault`', () => {
             .from([utxoVaultTriggeredP2TR, feeUTXO2])
             .addOutput(destOut)
 
+        tx2.inputs[0].lockUntilBlockHeight(2)
+
         // Mutate tx2 until e ends with 0x01.
         while (true) {
             sighash = getSigHashSchnorr(tx2, Buffer.from(tapleafVaultComplete, 'hex'), 0)
