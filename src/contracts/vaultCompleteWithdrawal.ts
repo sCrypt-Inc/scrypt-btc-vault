@@ -33,7 +33,8 @@ export class VaultCompleteWithdrawal extends SmartContract {
         shPreimage: SHPreimage,
         prevTxVer: ByteString,
         prevTxLocktime: ByteString,
-        prevTxInputs: ByteString, // Includes input length prefix...
+        prevTxInputContract: ByteString, // First input chunk should also include length prefix...
+        prevTxInputFee: ByteString,
         vaultSPK: ByteString,
         vaultAmt: ByteString,
         targetSPK: ByteString,
@@ -49,7 +50,8 @@ export class VaultCompleteWithdrawal extends SmartContract {
         const dust = toByteString('2202000000000000')
         const prevTxId = hash256(
             prevTxVer +
-            prevTxInputs +
+            prevTxInputContract +
+            prevTxInputFee +
             toByteString('02') + vaultAmt + vaultSPK + dust + targetSPK +
             prevTxLocktime
         )
