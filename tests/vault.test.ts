@@ -189,15 +189,7 @@ describe('Test SmartContract `Vault`', () => {
         const feeAmtBuff = Buffer.alloc(8)
         feeAmtBuff.writeBigInt64LE(3500n)
 
-        utxos = [
-            {
-                address: 'tb1q2xedyqdc9x7w4kk2sws3w22m73mtexv7mqjfux',
-                txId: tx0.id,
-                outputIndex: 1,
-                script: new btc.Script(addrP2WPKH),
-                satoshis: tx0.outputs[1].satoshis
-            }
-        ]
+        utxos = await fetchP2WPKHUtxos(addrP2WPKH)
 
         const txFee = new btc.Transaction()
             .from(utxos)
@@ -219,7 +211,7 @@ describe('Test SmartContract `Vault`', () => {
         };
 
         const feeUTXO = {
-            address: 'tb1q2xedyqdc9x7w4kk2sws3w22m73mtexv7mqjfux',
+            address: addrP2WPKH.toString(),
             txId: txFee.id,
             outputIndex: 0,
             script: new btc.Script(addrP2WPKH),
@@ -305,7 +297,7 @@ describe('Test SmartContract `Vault`', () => {
         };
 
         const feeUTXO2 = {
-            address: 'tb1q2xedyqdc9x7w4kk2sws3w22m73mtexv7mqjfux',
+            address: addrP2WPKH.toString(),
             txId: txFee.id,
             outputIndex: 1,
             script: new btc.Script(addrP2WPKH),
